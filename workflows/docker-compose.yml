@@ -1,0 +1,48 @@
+version: '1.0'
+
+services:
+   # motor real de la Base de Datos
+  mysql-db:
+    image: mysql:1.0
+    container_name: mysql_server
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: database-innovatech
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Servicio de Ventas (Backend 1)
+  back-ventas:
+    build: ./back-Ventas_SpringBoot/Springboot-API-REST
+    container_name: api_ventas
+    ports:
+      - "8081:8080" # Mapea el puerto para evitar colisiones
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/database-innovatech
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=admin123
+    depends_on:
+      - mysql-db
+
+  # Servicio de Despachos (Backend 2)
+  back-despachos:
+    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPA...
+    container_name: api_despachos
+    ports:
+      - "8082:8080"
+    depends_on:
+      - back-ventas # Si depende de que ventas esté arriba
+
+  # El Frontend
+  front-despacho:
+    build: ./front_despacho
+    container_name: frontend_app
+    ports:
+      - "80:80"
+    depends_on:
+      - back-despachos
+
+volumes:
+  mysql_data:
