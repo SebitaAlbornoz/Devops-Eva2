@@ -1,6 +1,4 @@
-name: CI/CD Innovatech App - DB con AWS
-
-
+name: CI/CD innovatech app - DB con AWS
 
 on:
   push:
@@ -8,19 +6,13 @@ on:
     paths:
       - "db/**" # Se activa automáticamente cuando detecta cambios en la carpeta "db"
 
-
-
 jobs:
   build-push-deploy-db:
     runs-on: ubuntu-latest
 
-
-
     steps:
     - name: Checkout código
       uses: actions/checkout@v3
-
-
 
     - name: Configurar credenciales AWS (Para el Runner)
       uses: aws-actions/configure-aws-credentials@v4
@@ -30,34 +22,26 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-
-
     - name: Login en Amazon ECR (Runner)
       uses: aws-actions/amazon-ecr-login@v1
 
 
-
-    - name: Build imagen DB y push a ECR
+    - name: Build y Push - Microservicio Ventas
       run: |
-        cd db
+        cd back-Ventas_SpringBoot/Springboot-API-REST
         docker build -t db-despacho .
         docker tag db-despacho:latest ${{ secrets.ECR_REPO_URL_DB }}:latest
         docker push ${{ secrets.ECR_REPO_URL_DB }}:latest
 
-
-
     - name: Desplegar Base de Datos en Subred Privada vía Bastión (SSH)
       uses: appleboy/ssh-action@v1.0.3
       with:
-
         # --- DESTINO FINAL: INSTANCIA DE LA BASE DE DATOS ---
 
         host: "10.0.3.100"                          # IP privada fija de tu BD
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
-
-
 
         # --- EL PUENTE (BASTIÓN): INSTANCIA DEL FRONTEND PÚBLICO ---
 
@@ -66,11 +50,8 @@ jobs:
         proxy_key: ${{ secrets.EC2_SSH_KEY }}
         proxy_port: 22
 
-
-
         script: |
           set -e
-
           # 1. Recuperar la URL del repositorio ECR desde tus secretos de GitHub
           REPO_URL="${{ secrets.ECR_REPO_URL_DB }}"
           REGISTRY_URL=$(echo "$REPO_URL" | cut -d'/' -f1)
@@ -82,12 +63,11 @@ jobs:
           docker pull $REPO_URL:latest
 
           # 4. Detener y remover el contenedor anterior si existe
-          docker stop tienda-db || true
-          docker rm tienda-db || true
+          docker stop db-despacho || true
+          docker rm db-despacho || true
 
           # 5. Encender el contenedor mapeando el puerto 3306 y manteniendo la persistencia del volumen
-          docker run -d --name tienda-db -p 3306:3306 -v dbdata:/var/lib/mysql $REPO_URL:latest
+          docker run -d --name db-despacho -p 3306:3306 -v dbdata:/var/lib/mysql $REPO_URL:latest
 
           # 6. Limpieza preventiva de espacio en disco en el servidor de la BD
           docker image prune -f
-

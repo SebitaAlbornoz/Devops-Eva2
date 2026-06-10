@@ -1,48 +1,30 @@
-version: '1.0'
+version: '3.8'
 
 services:
-   # motor real de la Base de Datos
-  mysql-db:
-    image: mysql:1.0
-    container_name: mysql_server
-    environment:
-      MYSQL_ROOT_PASSWORD: admin123
-      MYSQL_DATABASE: database-innovatech
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-  # Servicio de Ventas (Backend 1)
+  # Microservicio de Ventas
   back-ventas:
     build: ./back-Ventas_SpringBoot/Springboot-API-REST
-    container_name: api_ventas
+    container_name: ms_ventas
     ports:
-      - "8081:8080" # Mapea el puerto para evitar colisiones
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/database-innovatech
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=admin123
-    depends_on:
-      - mysql-db
+      - "8080:8080"
 
-  # Servicio de Despachos (Backend 2)
+  # Microservicio de Despachos
   back-despachos:
-    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPA...
-    container_name: api_despachos
+    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+    container_name: ms_despachos
     ports:
-      - "8082:8080"
-    depends_on:
-      - back-ventas # Si depende de que ventas esté arriba
+      - "8081:8080" # Usamos el 8081 externo para que no choque con Ventas
 
-  # El Frontend
+  # Frontend en React
   front-despacho:
     build: ./front_despacho
-    container_name: frontend_app
+    container_name: frontend_tienda
     ports:
       - "80:80"
     depends_on:
+      - back-ventas
       - back-despachos
 
 volumes:
-  mysql_data:
+  # Volumen definido para la persistencia requerida por la pauta
+  tienda_data:

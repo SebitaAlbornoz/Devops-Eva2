@@ -1,10 +1,11 @@
-name: CI/CD Innovatech App - Backend
+name: CI/CD innovatech app - Backend
 
 on:
   push:
     branches: [ "main" ] # Mantenemos tu configuración original de rama
     paths:
       - "backend/**"
+
 
 jobs:
   build-push-deploy-backend:
@@ -27,7 +28,7 @@ jobs:
 
     - name: Build imagen Backend y push a ECR
       run: |
-        cd backend
+        cd back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
         docker build -t backend-despacho .
         docker tag backend-despacho:latest ${{ secrets.ECR_REPO_URL_BACKEND }}:latest
         docker push ${{ secrets.ECR_REPO_URL_BACKEND }}:latest
@@ -55,7 +56,6 @@ jobs:
 
           # 1. Recuperar la URL del repositorio ECR desde tus secretos de GitHub
           REPO_URL="${{ secrets.ECR_REPO_URL_BACKEND }}"
-
           REGISTRY_URL=$(echo "$REPO_URL" | cut -d'/' -f1)
 
           # 2. Autenticar Docker (La EC2 usa su propio rol LabInstanceProfile internamente)
@@ -65,11 +65,11 @@ jobs:
           docker pull $REPO_URL:latest
 
           # 4. Detener y remover el contenedor anterior si existe
-          docker stop tienda-backend || true
-          docker rm tienda-backend || true
+          docker stop backend-despacho || true
+          docker rm backend-despacho || true
 
           # 5. Encender el contenedor mapeando el puerto 3001 expuesto en tu Dockerfile
-          docker run -d --name tienda-backend -p 3001:3001 $REPO_URL:latest
+          docker run -d --name backend-despacho -p 3001:8080 $REPO_URL:latest
 
           # 6. Limpieza preventiva de imágenes antiguas en el servidor de la App
           docker image prune -f

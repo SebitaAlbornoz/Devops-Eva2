@@ -1,5 +1,4 @@
-name: CI/CD Innovatech App - Frontend AWS
-
+name: CI/CD innovatech app - Frontend AWS
 
 on:
   push:
@@ -28,12 +27,10 @@ jobs:
 
     - name: Build imagen Frontend y push a ECR
       run: |
-
-        cd frontend
+        cd front_despacho
         docker build -t frontend-despacho .
         docker tag frontend-despacho:latest ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
         docker push ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
-
 
     - name: Desplegar Frontend vía SSH directo
       uses: appleboy/ssh-action@v1.0.3
@@ -52,8 +49,6 @@ jobs:
           export AWS_SESSION_TOKEN="${{ secrets.AWS_SESSION_TOKEN }}"
           export AWS_REGION="us-east-1"
 
-          
-
           # 2. Invocar tu secreto y extraer automáticamente el dominio de AWS para el login
           REPO_URL="${{ secrets.ECR_REPO_URL_FRONTEND }}"
           REGISTRY_URL=$(echo "$REPO_URL" | cut -d'/' -f1)
@@ -65,10 +60,9 @@ jobs:
           docker pull $REPO_URL:latest
 
           # 5. Refrescar el contenedor en la EC2
-          docker stop tienda-frontend || true
-          docker rm tienda-frontend || true
-          docker run -d --name tienda-frontend -p 80:80 $REPO_URL:latest
+          docker stop frontend-despacho || true
+          docker rm frontend-despacho || true
+          docker run -d --name frontend-despacho -p 80:80 $REPO_URL:latest
 
           # 6. Limpieza de espacio en disco
-
           docker image prune -f
