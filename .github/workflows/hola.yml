@@ -1,7 +1,8 @@
 name: Modificar YAML y saludar
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ "main" ]
 
 jobs:
   update-yaml:
