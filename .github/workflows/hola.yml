@@ -11,11 +11,3 @@ jobs:
     steps:
       - name: Mostrar Hola Mundo
         run: echo "Hola Mundo"
-
-      - name: Commit y Push de cambios
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add config.yml
-          git commit -m "Actualización automática del YAML" || echo "Sin cambios"
-          git push
