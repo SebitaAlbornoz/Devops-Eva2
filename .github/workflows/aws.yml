@@ -30,11 +30,8 @@ jobs:
       run: |
 
         cd frontend
-
         docker build -t frontend-despacho .
-
         docker tag frontend-despacho:latest ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
-
         docker push ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
 
 
