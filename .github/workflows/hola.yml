@@ -1,1 +1,27 @@
+name: Modificar YAML y saludar
 
+on:
+  workflow_dispatch:
+
+jobs:
+  update-yaml:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Modificar archivo YAML
+        run: |
+          sed -i 's/version: 1/version: 2/' config.yml
+
+      - name: Mostrar Hola Mundo
+        run: echo "Hola Mundo"
+
+      - name: Commit y Push de cambios
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add config.yml
+          git commit -m "Actualización automática del YAML" || echo "Sin cambios"
+          git push
