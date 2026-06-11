@@ -1,11 +1,10 @@
 name: CI/CD innovatech app - Frontend AWS
 
-
 on:
   push:
     branches: [ "main" ]
     paths:
-      - "front_despacho/**"
+      - "front_despacho**"
 
 jobs:
   build-push-deploy-frontend:
@@ -26,7 +25,6 @@ jobs:
     - name: Login en Amazon ECR (runner)
       uses: aws-actions/amazon-ecr-login@v1
 
-
     - name: Build imagen Frontend y push a ECR
       run: |
         cd front_despacho
@@ -41,8 +39,6 @@ jobs:
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
-        envs: AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN
-
         script: |
           set -e
 
@@ -52,14 +48,14 @@ jobs:
           export AWS_SESSION_TOKEN="${{ secrets.AWS_SESSION_TOKEN }}"
           export AWS_REGION="us-east-1"
 
-          # 2. Invocar tu secreto y extraer automáticamente el dominio de AWS para el login
+          # 2. Extraer automáticamente el dominio de AWS para el login
           REPO_URL="${{ secrets.ECR_REPO_URL_FRONTEND }}"
           REGISTRY_URL=$(echo "$REPO_URL" | cut -d'/' -f1)
 
-          # 3. Autenticar Docker de forma segura
+          # 3. Autenticar Docker de forma segura en la instancia
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REGISTRY_URL
 
-          # 4. Descargar la imagen usando la variable del secreto
+          # 4. Descargar la nueva imagen
           docker pull $REPO_URL:latest
 
           # 5. Refrescar el contenedor en la EC2
