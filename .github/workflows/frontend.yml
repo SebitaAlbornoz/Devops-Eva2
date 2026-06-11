@@ -2,7 +2,7 @@ name: CI/CD innovatech app - Frontend AWS
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "deploy" ]
     paths:
       - "front_despacho**"
 
@@ -12,20 +12,3 @@ jobs:
     steps:
     - name: Checkout codigo
       uses: actions/checkout@v3
-
-    - name: Desplegar y Compilar Frontend en EC2
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_PUBLIC_IP }}
-        username: ec2-user
-        key: ${{ secrets.EC2_SSH_KEY }}
-        port: 22
-        script: |
-          cd /home/ec2-user/app
-          git pull origin deploy
-          docker stop frontend-despacho || true
-          docker rm frontend-despacho || true
-          cd front_despacho
-          docker build -t frontend-despacho:latest .
-          docker run -d --name frontend-despacho -p 80:80 frontend-despacho:latest
-          docker image prune -f
