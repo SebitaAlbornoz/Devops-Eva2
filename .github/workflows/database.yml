@@ -2,7 +2,7 @@ name: CI/CD innovatech app - DB
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "" ]
     paths:
       - "back-Ventas_SpringBoot/Springboot-API-REST**" # Se activa automáticamente cuando detecta cambios en la carpeta "db"
 
