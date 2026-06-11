@@ -2,19 +2,17 @@ name: CI/CD innovatech app - Frontend AWS
 
 on:
   push:
-    branches: [ "deploy" ]
+    branches: [ "main" ]
     paths:
       - "front_despacho/**"
 
 jobs:
   build-and-deploy-frontend:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout código
+    - name: Checkout codigo
       uses: actions/checkout@v3
 
-    # Usamos tus secretos existentes de AWS para conectarnos de forma segura por SSH
     - name: Desplegar y Compilar Frontend en EC2
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -23,24 +21,11 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          set -e
-
-          # 1. Moverse a la carpeta del proyecto en tu servidor de AWS
           cd /home/ec2-user/app
-
-          # 2. Traer los últimos cambios del código desde la rama deploy
           git pull origin deploy
-
-          # 3. Detener el contenedor viejo del frontend si está corriendo
           docker stop frontend-despacho || true
           docker rm frontend-despacho || true
-
-          # 4. Construir la imagen localmente dentro de la EC2 usando tu Dockerfile Multi-Stage
           cd front_despacho
           docker build -t frontend-despacho:latest .
-
-          # 5. Levantar el contenedor fresco en el puerto web 80
           docker run -d --name frontend-despacho -p 80:80 frontend-despacho:latest
-
-          # 6. Limpieza automática de imágenes antiguas para no llenar la EC2
           docker image prune -f

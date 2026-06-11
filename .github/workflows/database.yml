@@ -1,4 +1,4 @@
-name: CI/CD innovatech app - DB con AWS
+name: CI/CD innovatech app - DB
 
 on:
   push:
