@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - "db/**" # Se activa automáticamente cuando detecta cambios en la carpeta "db"
+      - "back-Ventas_SpringBoot/Springboot-API-REST**" # Se activa automáticamente cuando detecta cambios en la carpeta "db"
 
 jobs:
   build-push-deploy-db:

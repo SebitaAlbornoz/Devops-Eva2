@@ -1,30 +1,57 @@
 version: '3.8'
 
 services:
+  # 1. Capa de Datos (MySQL)
+  tienda-db:
+    image: mysql:8.0
+    container_name: mysql_local
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: innovatech_app
+    ports:
+      - "3306:3306"
+    networks:
+      - innovatech_net
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
   # Microservicio de Ventas
   back-ventas:
     build: ./back-Ventas_SpringBoot/Springboot-API-REST
     container_name: ms_ventas
     ports:
       - "8080:8080"
+    networks:
+      - innovatech_net
+    volumes:
+      - ventas_data_volume:/app/data
 
   # Microservicio de Despachos
   back-despachos:
     build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
     container_name: ms_despachos
     ports:
-      - "8081:8080" # Usamos el 8081 externo para que no choque con Ventas
+      - "8081:8080" 
+    networks:
+      - innovatech_net
 
-  # Frontend en React
+  # Frontend
   front-despacho:
     build: ./front_despacho
     container_name: frontend_tienda
     ports:
       - "80:80"
+    networks:
+      - innovatech_net
     depends_on:
       - back-ventas
       - back-despachos
 
+networks:
+  innovatech_net:
+    driver: bridge
+
 volumes:
-  # Volumen definido para la persistencia requerida por la pauta
-  tienda_data:
+  ventas_data_volume:

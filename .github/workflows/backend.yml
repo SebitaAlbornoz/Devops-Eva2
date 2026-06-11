@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ] # Mantenemos tu configuración original de rama
     paths:
-      - "backend/**"
+      - "back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO**"
 
 
 jobs:

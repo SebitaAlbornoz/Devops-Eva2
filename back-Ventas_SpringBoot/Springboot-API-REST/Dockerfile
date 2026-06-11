@@ -5,9 +5,19 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Stage 2: Imagen ligera para la ejecución en producción
+# Stage 2: Imagen ligera de ejecución segura (Usuario no Root)
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+
+# Crear usuario y grupo de sistema sin privilegios lógicos
+RUN addgroup -S spring && adduser -S spring -G spring
+RUN mkdir -p /app/data && chown -R spring:spring /app
+
+# Mínimo privilegio activo
+USER spring:spring
+
+# Copiar el binario compilado manteniendo los permisos seguros
+COPY --from=build --chown=spring:spring /app/target/*.jar app.jar
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
