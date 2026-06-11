@@ -3,6 +3,9 @@ name: CI/CD innovatech app - Frontend AWS
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "front_despacho**"
+
 
 jobs:
   build-push-deploy-frontend:
