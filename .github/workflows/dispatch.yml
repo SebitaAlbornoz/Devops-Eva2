@@ -1,11 +1,10 @@
-name: CI/CD innovatech app - Backend
+name: CI/CD innovatech app - dispatch
 
 on:
   push:
     branches: [ "main" ] # Mantenemos tu configuración original de rama
     paths:
       - "back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO**"
-
 
 jobs:
   build-push-deploy-backend:

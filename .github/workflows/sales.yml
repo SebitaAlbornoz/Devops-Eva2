@@ -1,4 +1,4 @@
-name: CI/CD innovatech app - DB
+name: CI/CD innovatech app - sales
 
 on:
   push:
