@@ -1,0 +1,13 @@
+name: Modificar YAML y saludar
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  update-yaml:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mostrar Hola Mundo
+        run: echo "Hola Mundo"
