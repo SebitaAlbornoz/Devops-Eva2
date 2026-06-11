@@ -1,10 +1,11 @@
-name: CI/CD innovatech app - sales
+name: CI/CD innovatech app - DB con AWS
+
 
 on:
   push:
     branches: [ "main" ]
     paths:
-      - "back-Ventas_SpringBoot/Springboot-API-REST**" # Se activa automáticamente cuando detecta cambios en la carpeta "db"
+      - "back-Ventas_SpringBoot/Springboot-API-REST**"
 
 jobs:
   build-push-deploy-db:
