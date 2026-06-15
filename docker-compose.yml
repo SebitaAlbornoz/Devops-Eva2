@@ -1,46 +1,79 @@
 version: '3.8'
 
 services:
-  # 1. Capa de Datos (MySQL)
-  tienda-db:
+  # Capa de Datos (MySQL)
+  mysql:
     image: mysql:8.0
-    container_name: mysql_local
+    container_name: mysql
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: admin123
-      MYSQL_DATABASE: innovatech_app
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306"
-    networks:
-      - innovatech_net
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: always
+    networks:
+      - backend-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Microservicio de Ventas
   back-ventas:
-    build: ./back-Ventas_SpringBoot/Springboot-API-REST
-    container_name: ms_ventas
+    build:
+      context: ./back-Ventas_SpringBoot/Springboot-API-REST
+      dockerfile: Dockerfile
+    container_name: back-ventas
+    restart: unless-stopped
+    environment:
+      DB_ENDPOINT: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
-      - innovatech_net
-    volumes:
-      - ventas_data_volume:/app/data
+      - backend-net
+      - frontend-net
 
   # Microservicio de Despachos
   back-despachos:
-    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
-    container_name: ms_despachos
+    build:
+      context: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+      dockerfile: Dockerfile
+    container_name: back-despachos
+    restart: unless-stopped
+    environment:
+      DB_ENDPOINT: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "8081:8080" 
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
-      - innovatech_net
+      - backend-net
+      - frontend-net
 
   # Frontend
   front-despacho:
-    build: ./front_despacho
-    container_name: frontend_tienda
+    build: 
+    	context: ./front_despacho
+    	dockerfile: Dockerfile
+    container_name: frontend_despacho
+    restart: unless-stopped
     ports:
       - "80:80"
     networks:
@@ -48,10 +81,15 @@ services:
     depends_on:
       - back-ventas
       - back-despachos
+    networks:
+      - frontend-net
 
 networks:
-  innovatech_net:
+  backend-net:
+    driver: bridge
+  frontend-net:
     driver: bridge
 
 volumes:
-  ventas_data_volume:
+  mysql_data:
+  	driver: local

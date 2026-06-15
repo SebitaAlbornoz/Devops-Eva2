@@ -28,11 +28,16 @@ jobs:
 
 
     - name: Build y Push - Microservicio Ventas
+      env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPO_URL_DB }}
+          IMAGE_TAG: ${{ github.sha }}
       run: |
-        cd back-Ventas_SpringBoot/Springboot-API-REST
-        docker build -t db-despacho .
-        docker tag db-despacho:latest ${{ secrets.ECR_REPO_URL_DB }}:latest
-        docker push ${{ secrets.ECR_REPO_URL_DB }}:latest
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            ./back-Ventas_SpringBoot/Springboot-API-REST
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
     - name: Desplegar Base de Datos en Subred Privada vía Bastión (SSH)
       uses: appleboy/ssh-action@v1.0.3
@@ -52,23 +57,21 @@ jobs:
         proxy_port: 22
 
         script: |
-          set -e
-          # 1. Recuperar la URL del repositorio ECR desde tus secretos de GitHub
-          REPO_URL="${{ secrets.ECR_REPO_URL_DB }}"
-          REGISTRY_URL=$(echo "$REPO_URL" | cut -d'/' -f1)
-
-          # 2. Autenticar Docker (La EC2 usa su rol LabInstanceProfile internamente de forma automática)
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REGISTRY_URL
-
-          # 3. Descargar la última versión de la imagen de MySQL
-          docker pull $REPO_URL:latest
-
-          # 4. Detener y remover el contenedor anterior si existe
-          docker stop db-despacho || true
-          docker rm db-despacho || true
-
-          # 5. Encender el contenedor mapeando el puerto 3306 y manteniendo la persistencia del volumen
-          docker run -d --name db-despacho -p 3306:3306 -v dbdata:/var/lib/mysql $REPO_URL:latest
-
-          # 6. Limpieza preventiva de espacio en disco en el servidor de la BD
-          docker image prune -f
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+              docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URL }}
+            docker stop back-ventas || true
+            docker rm back-ventas || true
+            docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_VENTAS }}:latest
+            docker run -d \
+              --name back-ventas \
+              --restart unless-stopped \
+              --network host \
+              -e DB_ENDPOINT=localhost \
+              -e DB_PORT=3306 \
+              -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
+              -e MYSQL_USER=${{ secrets.DB_USERNAME }} \
+              -e MYSQL_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e MYSQL_ROOT_PASSWORD=rootpass123 \
+              -v dbdata:/var/lib/mysql \
+              $REPO_URL:latest
+            docker image prune -f

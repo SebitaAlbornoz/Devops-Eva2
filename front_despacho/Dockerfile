@@ -1,25 +1,23 @@
 # --- ETAPA 1: Compilación del código ---
-FROM node:18-alpine AS build
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci --silent
 
 COPY . .
-# Cambiado CMD por RUN para que compile de verdad durante el docker build
 RUN npm run build
 
 # --- ETAPA 2: Servidor de Producción con Nginx ---
-FROM nginx:1.21-alpine
+FROM nginx:1.21-alpine AS runtime
 
-# Copiamos la carpeta compilada (Vite genera 'dist') al directorio de Nginx
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copiamos tu archivo de configuración de Nginx si lo tienes
-COPY default.conf /etc/nginx/conf.d/default.conf
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
 
 EXPOSE 80
 
-# Comando único para mantener Nginx corriendo en primer plano
 CMD ["nginx", "-g", "daemon off;"]

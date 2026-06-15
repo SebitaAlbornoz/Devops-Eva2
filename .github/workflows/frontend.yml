@@ -27,11 +27,17 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build imagen Frontend y push a ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.ECR_REPO_FRONTEND }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
         cd front_despacho
-        docker build -t frontend-despacho .
-        docker tag frontend-despacho:latest ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
-        docker push ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            ./front_despacho
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
     - name: Desplegar Frontend vía SSH directo
       uses: appleboy/ssh-action@v1.0.3
@@ -39,21 +45,15 @@ jobs:
         host: ${{ secrets.EC2_PUBLIC_IP }}
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
-        port: 22
         script: |
-          set -e
-          export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
-          export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          export AWS_SESSION_TOKEN="${{ secrets.AWS_SESSION_TOKEN }}"
-          export AWS_REGION="us-east-1"
-          
-          REPO_URL="${{ secrets.ECR_REPO_URL_FRONTEND }}"
-          REGISTRY_URL=$(echo "$REPO_URL" | cut -d'/' -f1)
-          
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REGISTRY_URL
-          
-          docker pull $REPO_URL:latest
-          docker stop frontend-despacho || true
-          docker rm frontend-despacho || true
-          docker run -d --name frontend-despacho -p 80:80 $REPO_URL:latest
-          docker image prune -f
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+              docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URL }}
+            docker stop front-despacho || true
+            docker rm front-despacho || true
+            docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_FRONTEND }}:latest
+            docker run -d \
+              --name front-despacho \
+              --restart unless-stopped \
+              -p 80:80 \
+              ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_FRONTEND }}:latest
+            docker image prune -f
