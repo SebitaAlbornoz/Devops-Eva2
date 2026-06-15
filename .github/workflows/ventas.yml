@@ -24,12 +24,13 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Login en Amazon ECR (Runner)
+      id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
 
     - name: Build y Push - Microservicio Ventas
       env:
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY_URL }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPO_URL_DB }}
           IMAGE_TAG: ${{ github.sha }}
       run: |
