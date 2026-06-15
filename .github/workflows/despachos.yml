@@ -29,7 +29,7 @@ jobs:
     - name: Build imagen Backend y push a ECR
       env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPO_BACKEND }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPO_URL_BACKEND }}
           IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
@@ -61,7 +61,7 @@ jobs:
               docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URL }}
             docker stop back-despachos || true
             docker rm back-despachos || true
-            docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_BACKEND }}:latest
+            docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_URL_BACKEND }}:latest
             docker run -d \
               --name back-despachos \
               --restart unless-stopped \
@@ -73,5 +73,5 @@ jobs:
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               -e MYSQL_ROOT_PASSWORD=rootpass123 \
               -v dbdata:/var/lib/mysql \
-              ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_BACKEND }}:latest
+              ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_URL_BACKEND }}:latest
           docker image prune -f

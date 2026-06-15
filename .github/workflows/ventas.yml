@@ -61,7 +61,7 @@ jobs:
               docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URL }}
             docker stop back-ventas || true
             docker rm back-ventas || true
-            docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_VENTAS }}:latest
+            docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_URL_DB }}:latest
             docker run -d \
               --name back-ventas \
               --restart unless-stopped \
