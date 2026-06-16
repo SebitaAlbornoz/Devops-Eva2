@@ -60,11 +60,11 @@ jobs:
         script: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
               docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URL }}
-            docker stop back-despachos || true
-            docker rm back-despachos || true
+            docker stop backend-despacho || true
+            docker rm backend-despacho || true
             docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_URL_BACKEND }}:latest
             docker run -d \
-              --name back-despachos \
+              --name backend-despacho \
               --restart unless-stopped \
               --network host \
               -p 8081:3001 \

@@ -47,11 +47,11 @@ jobs:
         script: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
             docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URL }}
-          docker stop front-despacho || true
-          docker rm front-despacho || true
+          docker stop frontend-despacho || true
+          docker rm frontend-despacho || true
           docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
           docker run -d \
-            --name front-despacho \
+            --name frontend-despacho \
             --restart unless-stopped \
             -p 80:80 \
             ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_URL_FRONTEND }}:latest
