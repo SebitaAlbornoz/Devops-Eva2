@@ -67,6 +67,7 @@ jobs:
               --name back-despachos \
               --restart unless-stopped \
               --network host \
+              -p 8081:3001 \
               -e DB_ENDPOINT=localhost \
               -e DB_PORT=3306 \
               -e DB_NAME=${{ secrets.DB_NAME }} \

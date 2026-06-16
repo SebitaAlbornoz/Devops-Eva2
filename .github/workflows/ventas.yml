@@ -67,6 +67,7 @@ jobs:
               --name back-ventas \
               --restart unless-stopped \
               --network host \
+              -p 8080:8080 \
               -e DB_ENDPOINT=localhost \
               -e DB_PORT=3306 \
               -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
