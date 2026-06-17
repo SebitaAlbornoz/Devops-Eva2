@@ -70,7 +70,7 @@ jobs:
                 -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
                 -e MYSQL_USER=${{ secrets.DB_USERNAME }} \
                 -e MYSQL_PASSWORD=${{ secrets.DB_PASSWORD }} \
-                -p 3306:3306 \
+                -p 3307:3306 \
                 -v dbdata:/var/lib/mysql \
                 mysql:8.0
               echo "Esperando que MySQL arranque..."
