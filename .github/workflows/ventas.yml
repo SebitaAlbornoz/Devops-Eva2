@@ -60,6 +60,23 @@ jobs:
         script: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
               docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URL }}
+
+              #Levantar MySQL
+              if ! docker ps | grep -q mysql-ventas; then
+              docker run -d \
+                --name mysql-ventas \
+                --restart unless-stopped \
+                -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }} \
+                -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
+                -e MYSQL_USER=${{ secrets.DB_USERNAME }} \
+                -e MYSQL_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                -p 3306:3306 \
+                -v dbdata:/var/lib/mysql \
+                mysql:8.0
+              echo "Esperando que MySQL arranque..."
+              sleep 15
+            fi
+
             docker stop db-despacho || true
             docker rm db-despacho || true
             docker pull ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_URL_DB }}:latest
@@ -68,12 +85,10 @@ jobs:
               --restart unless-stopped \
               --network host \
               -p 8080:8080 \
-              -e DB_ENDPOINT=localhost \
+              -e DB_ENDPOINT=172.17.0.1 \
               -e DB_PORT=3306 \
-              -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
-              -e MYSQL_USER=${{ secrets.DB_USERNAME }} \
-              -e MYSQL_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e MYSQL_ROOT_PASSWORD=rootpass123 \
-              -v dbdata:/var/lib/mysql \
-              $REPO_URL:latest
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              ${{ secrets.ECR_REGISTRY_URL }}/${{ secrets.ECR_REPO_URL_DB }}:latest
             docker image prune -f

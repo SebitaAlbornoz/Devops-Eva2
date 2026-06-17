@@ -59,7 +59,7 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "8081:8081"
+      - "3001:8081"
     depends_on:
       mysql:
         condition: service_healthy
