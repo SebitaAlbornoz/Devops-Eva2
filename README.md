@@ -1,36 +1,122 @@
-# Arquitectura e Implementación
+# Innovatech Chile
 
-El proyecto Innovatech Chile fue desarrollado utilizando una arquitectura basada en servicios en la nube, permitiendo que la aplicación sea más flexible,
-escalable y fácil de administrar. Para lograrlo, se implementaron tecnologías como Docker, Docker Compose, Terraform y Amazon Web Services (AWS).
+Proyecto desarrollado para implementar una solución en la nube utilizando Docker, Docker Compose, Terraform y Amazon Web Services (AWS). La aplicación fue diseñada bajo una arquitectura Frontend y Backend, permitiendo un despliegue automatizado, escalable y de alta disponibilidad.
 
-## Contenedorización con Docker:
-Se utilizaron Docker y Docker Compose para contenerizar todos los componentes de la aplicación. 
-Esto permite que cada servicio se ejecute en un entorno aislado, asegurando que el sistema funcione de la misma manera en cualquier computador o servidor.
+## Descripción del proyecto
 
-Los beneficios de usar Docker son: 
-Entornos de desarrollo y producción consistentes.
-Mayor portabilidad entre diferentes sistemas operativos.
-Simplificación de la administración de dependencias.
+Innovatech Chile buscó modernizar su infraestructura tecnológica mediante la implementación de una plataforma basada en servicios en la nube.
 
-## Infraestructura como Código con Terraform:
-La infraestructura fue creada mediante Terraform, permitiendo definir todos los recursos de AWS mediante archivos de configuración.
+La solución desarrollada permite ejecutar la aplicación utilizando contenedores Docker, automatizar la creación de infraestructura mediante Terraform y desplegar los servicios sobre Amazon EC2, garantizando una plataforma robusta, portable y preparada para futuros requerimientos.
 
-Con esta herramienta es posible:
-Automatizar la creación de la infraestructura.
-Reproducir el mismo entorno en cualquier momento.
-Reducir errores de configuración manual.
-Facilitar el mantenimiento y futuras modificaciones.
+## Objetivos
+Diseñar una arquitectura Frontend y Backend.
+Implementar contenedores Docker para cada servicio.
+Automatizar el despliegue mediante Docker Compose.
+Crear la infraestructura utilizando Terraform (IaC).
+Implementar la solución sobre AWS EC2.
+Obtener una plataforma escalable y de alta disponibilidad.
 
-## Implementación en AWS:
-La aplicación fue desplegada en Amazon Web Services (AWS) utilizando instancias EC2, donde se ejecutan los contenedores Docker que conforman el sistema.
+## Arquitectura del proyecto
 
-Esta implementación ofrece:
-Infraestructura en la nube.
-Alta disponibilidad de los servicios.
+La solución está compuesta por dos capas principales:
 
-## Arquitectura de capas
-El sistema fue desarrollado siguiendo una arquitectura cliente-servidor, separando la aplicación en dos capas principales: Frontend Y Backend
-Gracias a Docker, Docker Compose y Terraform, el proceso de despliegue puede realizarse de forma automatizada, reduciendo significativamente el tiempo de configuración del entorno y minimizando errores humanos.
+## Frontend
+Interfaz gráfica para los usuarios.
+Envía solicitudes HTTP al Backend.
+Presenta la información recibida.
+## Backend
+Implementa la lógica de negocio.
+Procesa las solicitudes del Frontend.
+Gestiona el acceso a la base de datos y demás servicios.
 
-La solución implementada deja una base tecnológica preparada para futuras mejoras, como la incorporación de nuevos microservicios, balanceadores de carga, bases de datos administradas, 
-monitoreo y procesos de integración y despliegue continuo (CI/CD).
+## Infraestructura en la nube
+
+Toda la infraestructura fue desplegada en AWS utilizando:
+
+EC2 para alojar la aplicación.
+Docker para ejecutar los servicios.
+Docker Compose para administrar los contenedores.
+Terraform para crear automáticamente los recursos necesarios.
+
+## Docker
+Cada componente del sistema fue empaquetado en un contenedor independiente.
+
+Esto permitió:
+
+Portabilidad.
+Consistencia entre ambientes.
+Fácil mantenimiento.
+Despliegue rápido.
+
+## Docker Compose
+
+Docker Compose permite levantar todos los servicios de la aplicación mediante un único comando.
+
+Entre sus ventajas destacan:
+
+Administración centralizada.
+Comunicación entre contenedores.
+Configuración sencilla.
+Inicio y detención automática de todos los servicios.
+
+## Terraform
+
+Terraform fue utilizado como herramienta de Infraestructura como Código (IaC).
+
+Gracias a ello fue posible:
+
+Automatizar el despliegue.
+Versionar la infraestructura.
+Evitar configuraciones manuales.
+Reproducir el entorno cuando sea necesario.
+
+## Amazon Web Services (AWS)
+
+La infraestructura fue implementada utilizando instancias EC2.
+
+Estas instancias proporcionan:
+
+Recursos de procesamiento.
+Escalabilidad.
+Disponibilidad.
+Flexibilidad para futuras ampliaciones.
+
+## Estructura del proyecto
+Innovatech-Chile/
+│
+├── frontend/
+├── backend/
+├── terraform/
+├── docker-compose.yml
+├── Dockerfile
+└── README.md
+
+## Tecnologías utilizadas
+Java
+Spring Boot
+Docker
+Docker Compose
+Terraform
+AWS EC2
+Git
+GitHub
+
+## Beneficios obtenidos
+Despliegue automatizado.
+Infraestructura reproducible.
+Arquitectura escalable.
+Portabilidad de los servicios.
+Mejor administración de la infraestructura.
+Mayor disponibilidad de la aplicación.
+Facilidad para futuras ampliaciones.
+
+## Mejoras futuras
+Implementar un balanceador de carga.
+Incorporar una base de datos administrada.
+Agregar monitoreo mediante CloudWatch.
+Integrar un pipeline CI/CD.
+Desplegar múltiples instancias para alta disponibilidad.
+
+## Integrantes
+Sebastias Albornoz
+Maximiliano Araos
