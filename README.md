@@ -3,7 +3,7 @@ Arquitectura e Implementación
 El proyecto Innovatech Chile fue desarrollado utilizando una arquitectura basada en servicios en la nube, permitiendo que la aplicación sea más flexible,
 escalable y fácil de administrar. Para lograrlo, se implementaron tecnologías como Docker, Docker Compose, Terraform y Amazon Web Services (AWS).
 
-Contenedorización con Docker
+Contenedorización con Docker:
 Se utilizaron Docker y Docker Compose para contenerizar todos los componentes de la aplicación. 
 Esto permite que cada servicio se ejecute en un entorno aislado, asegurando que el sistema funcione de la misma manera en cualquier computador o servidor.
 
@@ -12,18 +12,16 @@ Entornos de desarrollo y producción consistentes.
 Mayor portabilidad entre diferentes sistemas operativos.
 Simplificación de la administración de dependencias.
 
-Infraestructura como Código con Terraform
+Infraestructura como Código con Terraform:
 La infraestructura fue creada mediante Terraform, permitiendo definir todos los recursos de AWS mediante archivos de configuración.
 
 Con esta herramienta es posible:
 Automatizar la creación de la infraestructura.
 Reproducir el mismo entorno en cualquier momento.
-
 Reducir errores de configuración manual.
 Facilitar el mantenimiento y futuras modificaciones.
 
-Implementación en AWS
-
+Implementación en AWS:
 La aplicación fue desplegada en Amazon Web Services (AWS) utilizando instancias EC2, donde se ejecutan los contenedores Docker que conforman el sistema.
 
 Esta implementación ofrece:
