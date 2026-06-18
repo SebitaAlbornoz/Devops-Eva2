@@ -67,7 +67,7 @@ jobs:
                 --name mysql-ventas \
                 --restart unless-stopped \
                 -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }} \
-                -e MYSQL_DATABASE=${{ secrets.DB_NAME }} \
+                -e MYSQL_DATABASE=${{ secrets.DB_NAME_VENTAS }} \
                 -e MYSQL_USER=${{ secrets.DB_USERNAME }} \
                 -e MYSQL_PASSWORD=${{ secrets.DB_PASSWORD }} \
                 -p 3306:3306 \
