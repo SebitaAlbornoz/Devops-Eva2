@@ -46,7 +46,7 @@ jobs:
       with:
         # --- DESTINO FINAL: INSTANCIA DE LA BASE DE DATOS ---
 
-        host: "10.0.3.100"                          # IP privada fija de tu BD
+        host: "10.0.3.164"                          # IP privada fija de tu BD
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22

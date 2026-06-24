@@ -8,7 +8,7 @@ RUN mvn clean package -DskipTests -q
 # Stage 2: Imagen ligera de ejecución segura
 FROM public.ecr.aws/docker/library/eclipse-temurin:17-jre-alpine
 WORKDIR /app
-EXPOSE 8081
+EXPOSE 8080
 
 RUN addgroup -S spring && adduser -S spring -G spring
 

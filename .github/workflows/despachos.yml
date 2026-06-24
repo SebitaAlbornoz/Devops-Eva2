@@ -46,7 +46,7 @@ jobs:
 
         # --- DESTINO FINAL: INSTANCIA DE LA APP / BACKEND ---
 
-        host: "10.0.2.124"                        # Tu IP privada fija del Backend
+        host: "10.0.2.205"                        # Tu IP privada fija del Backend
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
