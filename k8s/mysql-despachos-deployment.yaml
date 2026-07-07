@@ -1,41 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-despacho
+  name: mysql-despachos
   namespace: innovatech-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: backend-despacho
+      app: mysql-despachos
   template:
     metadata:
       labels:
-        app: backend-despacho
+        app: mysql-despachos
     spec:
-      imagePullSecrets:
-        - name: ecr-secret
       containers:
-        - name: backend-despacho
-          image: 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:eks-v1
+        - name: mysql-despachos
+          image: mysql:8.0
           ports:
-            - containerPort: 8081
+            - containerPort: 3306
           env:
-            - name: DB_ENDPOINT
-              value: "mysql-despachos"
-            - name: DB_PORT
-              value: "3306"
-            - name: DB_NAME
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: despachos-secret
+                  key: DB_PASSWORD
+            - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
                   name: despachos-secret
                   key: DB_NAME
-            - name: DB_USERNAME
+            - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
                   name: despachos-secret
                   key: DB_USERNAME
-            - name: DB_PASSWORD
+            - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: despachos-secret
@@ -43,7 +42,13 @@ spec:
           resources:
             requests:
               cpu: "100m"
-              memory: "128Mi"
+              memory: "256Mi"
             limits:
               cpu: "500m"
               memory: "512Mi"
+          volumeMounts:
+            - name: mysql-despachos-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-despachos-storage
+          emptyDir: {}
