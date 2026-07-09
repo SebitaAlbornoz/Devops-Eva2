@@ -36,7 +36,7 @@ jobs:
       run: |
         docker build -t 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:${{ github.sha }} \
                      -t 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:latest \
-                     ./back-Despachos_SpringBoot/Springboot-API-REST
+                     ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
         docker push 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:${{ github.sha }}
         docker push 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:latest
 
