@@ -1,0 +1,71 @@
+name: CI/CD Pipeline - Deploy to EKS
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Configurar credenciales AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login en Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build y Push - Frontend
+      run: |
+        docker build -t 128806834448.dkr.ecr.us-east-1.amazonaws.com/frontend-despacho:${{ github.sha }} \
+                     -t 128806834448.dkr.ecr.us-east-1.amazonaws.com/frontend-despacho:latest \
+                     ./front_despacho
+        docker push 128806834448.dkr.ecr.us-east-1.amazonaws.com/frontend-despacho:${{ github.sha }}
+        docker push 128806834448.dkr.ecr.us-east-1.amazonaws.com/frontend-despacho:latest
+
+    - name: Build y Push - Backend Despachos
+      run: |
+        docker build -t 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:${{ github.sha }} \
+                     -t 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:latest \
+                     ./back-Despachos_SpringBoot/Springboot-API-REST
+        docker push 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:${{ github.sha }}
+        docker push 128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:latest
+
+    - name: Build y Push - Backend Ventas
+      run: |
+        docker build -t 128806834448.dkr.ecr.us-east-1.amazonaws.com/db-despacho:${{ github.sha }} \
+                     -t 128806834448.dkr.ecr.us-east-1.amazonaws.com/db-despacho:latest \
+                     ./back-Ventas_SpringBoot/Springboot-API-REST
+        docker push 128806834448.dkr.ecr.us-east-1.amazonaws.com/db-despacho:${{ github.sha }}
+        docker push 128806834448.dkr.ecr.us-east-1.amazonaws.com/db-despacho:latest
+
+    - name: Configurar kubectl
+      run: |
+        aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+    - name: Deploy a EKS
+      run: |
+        kubectl set image deployment/frontend-despacho \
+          frontend=128806834448.dkr.ecr.us-east-1.amazonaws.com/frontend-despacho:${{ github.sha }} \
+          -n ${{ secrets.EKS_NAMESPACE }}
+        kubectl set image deployment/backend-despacho \
+          backend-despacho=128806834448.dkr.ecr.us-east-1.amazonaws.com/backend-despacho:${{ github.sha }} \
+          -n ${{ secrets.EKS_NAMESPACE }}
+        kubectl set image deployment/backend-ventas \
+          backend-ventas=128806834448.dkr.ecr.us-east-1.amazonaws.com/db-despacho:${{ github.sha }} \
+          -n ${{ secrets.EKS_NAMESPACE }}
+
+    - name: Verificar despliegue
+      run: |
+        kubectl rollout status deployment/frontend-despacho -n ${{ secrets.EKS_NAMESPACE }}
+        kubectl rollout status deployment/backend-despacho -n ${{ secrets.EKS_NAMESPACE }}
+        kubectl rollout status deployment/backend-ventas -n ${{ secrets.EKS_NAMESPACE }}
